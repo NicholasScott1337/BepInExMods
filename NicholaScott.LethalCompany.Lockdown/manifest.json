@@ -1,0 +1,10 @@
+{
+  "name": "Lockdown",
+  "version_number": "1.0.2",
+  "website_url": "",
+  "description": "Prevent griefing in a public lobby! Restricts connected clients from doing many configurable actions.",
+  "dependencies": [
+    "BepInEx-BepInExPack-5.4.2100",
+    "Ozone-BepInUtils-1.1.0"
+  ]
+}

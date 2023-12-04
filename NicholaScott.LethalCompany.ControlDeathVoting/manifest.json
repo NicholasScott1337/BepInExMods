@@ -1,0 +1,10 @@
+{
+  "name": "Disregard_Early_Voting",
+  "version_number": "1.0.1",
+  "website_url": "",
+  "description": "New configuration options. Default is at least 2 people voting to leave early.",
+  "dependencies": [
+    "BepInEx-BepInExPack-5.4.2100",
+    "Ozone-BepInUtils-1.1.0"
+  ]
+}
