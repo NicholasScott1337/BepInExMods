@@ -115,43 +115,102 @@ namespace NicholaScott.LethalCompany.HundredQuota
         public static GameObject SpawnPrefab;
         public static bool SpawnPrefabAssigned = false;
 
-        [HarmonyPatch(typeof(HoarderBugAI), "ChooseNestPosition")]
-        [HarmonyPostfix]
-        public static void SpawnHoarderLootPile(HoarderBugAI __instance)
+        public static SpawnableItemWithRarity FindPrefab(params string[] queries)
+        {
+            var lambda = new Predicate<SpawnableItemWithRarity>((f) =>
+            {
+                var toLowered = f.spawnableItem.itemName.ToLower();
+                var matches = true;
+                foreach (var query in queries)
+                    if (query.StartsWith("!") ? toLowered.Contains(query.Substring(1)) : !toLowered.Contains(query))
+                        matches = false;
+                return matches;
+            });
+            foreach (var selectableLevel in StartOfRound.Instance.levels)
+            {
+                var scrapSorted = selectableLevel.spawnableScrap.Where(lambda)
+                if (selectableLevel.spawnableScrap.Exists(lambda))
+                    return selectableLevel.spawnableScrap.Find(lambda);
+            }
+
+            throw new Exception("The provided queries resulted in no prefab in all levels.");
+        }
+        
+        [HarmonyPatch(typeof(RoundManager), "waitForScrapToSpawnToSync")]
+        [HarmonyPrefix]
+        public static void InjectAdditionalScrapItems(ref NetworkObjectReference[] spawnedScrap, ref int[] scrapValues)
         {
             var newRandom = new System.Random(StartOfRound.Instance.randomMapSeed - 13);
-            var scrapSyncCoroutine = typeof(RoundManager).GetMethod("waitForScrapToSpawnToSync",
-                BindingFlags.Instance | BindingFlags.NonPublic);
-
-            var numberOfScrapToGenerate = newRandom.Next(20);
+            var numberOfScrapToGenerate = Mathf.RoundToInt(Mathf.Pow(2, StartOfRound.Instance.daysPlayersSurvivedInARow + 1));
+            numberOfScrapToGenerate = newRandom.Next(numberOfScrapToGenerate / 2, numberOfScrapToGenerate);
             var netObjRef = new NetworkObjectReference[numberOfScrapToGenerate];
-            var scrapValues = new int[numberOfScrapToGenerate];
+            var scrapPrices = new int[numberOfScrapToGenerate];
+            var spawnableScrapArray = RoundManager.Instance.currentLevel.spawnableScrap;
 
+            var goldItem = FindPrefab("gold", "bar");
+            
             for (var idx = 0; idx < numberOfScrapToGenerate; idx++)
             {
-                var spawnableScrapArray = RoundManager.Instance.currentLevel.spawnableScrap;
-                var positionInRadius = RoundManager.Instance.GetRandomNavMeshPositionInRadius(__instance.nestPosition, 4f);
-                var scrapToSpawn = spawnableScrapArray[newRandom.Next(spawnableScrapArray.Count())];
+                var spawnPositions = GameObject.FindGameObjectsWithTag("OutsideAINode");
+                var spawnPos = spawnPositions[newRandom.Next(spawnPositions.Length)];
+                var positionInRadius = RoundManager.Instance.GetRandomNavMeshPositionInRadius(spawnPos.transform.position, 4f);
                 var newGo = Object.Instantiate<GameObject>(
-                    scrapToSpawn.spawnableItem.spawnPrefab, 
+                    goldItem.spawnableItem.spawnPrefab, 
                     positionInRadius, Quaternion.identity, RoundManager.Instance.spawnedScrapContainer);
-
+            
                 var grabbable = newGo.GetComponent<GrabbableObject>();
                 grabbable.transform.rotation = Quaternion.Euler(grabbable.itemProperties.restingRotation);
                 grabbable.fallTime = 0.0f;
-                grabbable.scrapValue = Mathf.RoundToInt(newRandom.Next(scrapToSpawn.spawnableItem.minValue, scrapToSpawn.spawnableItem.maxValue) *
+                grabbable.scrapValue = Mathf.RoundToInt(newRandom.Next(goldItem.spawnableItem.minValue, goldItem.spawnableItem.maxValue) *
                                                   RoundManager.Instance.scrapValueMultiplier);
                 var netObj = newGo.GetComponent<NetworkObject>();
                 netObj.Spawn();
-
+            
                 netObjRef[idx] = (NetworkObjectReference)netObj;
-                scrapValues[idx] = grabbable.scrapValue;
+                scrapPrices[idx] = grabbable.scrapValue;
             }
-
-            Singleton<HundredQuota>.Logger.LogWarning($"We've successfully injected a loot pile of size {numberOfScrapToGenerate} @ position {__instance.nestPosition}");
-            HUDManager.Instance.DisplayTip("Lootbug", $"Spawned {numberOfScrapToGenerate} items at position {__instance.nestPosition}");
-            RoundManager.Instance.StartCoroutine(scrapSyncCoroutine?.Invoke(RoundManager.Instance, new object[] {netObjRef, scrapValues}) as IEnumerator);
+            HUDManager.Instance.AddTextToChatOnServer($"Placed {numberOfScrapToGenerate} Gold Bar{(numberOfScrapToGenerate > 1 ? "s" : "")} in exterior.");
+            spawnedScrap = netObjRef.Concat(spawnedScrap).ToArray();
+            scrapValues = scrapPrices.Concat(scrapValues).ToArray();
         }
+        
+        // [HarmonyPatch(typeof(HoarderBugAI), "ChooseNestPosition")]
+        // [HarmonyPostfix]
+        // public static void SpawnHoarderLootPile(HoarderBugAI __instance)
+        // {
+        //     var newRandom = new System.Random(StartOfRound.Instance.randomMapSeed - 13);
+        //     var scrapSyncCoroutine = typeof(RoundManager).GetMethod("waitForScrapToSpawnToSync",
+        //         BindingFlags.Instance | BindingFlags.NonPublic);
+        //
+        //     var numberOfScrapToGenerate = newRandom.Next(20);
+        //     var netObjRef = new NetworkObjectReference[numberOfScrapToGenerate];
+        //     var scrapValues = new int[numberOfScrapToGenerate];
+        //
+        //     for (var idx = 0; idx < numberOfScrapToGenerate; idx++)
+        //     {
+        //         var spawnableScrapArray = RoundManager.Instance.currentLevel.spawnableScrap;
+        //         var positionInRadius = RoundManager.Instance.GetRandomNavMeshPositionInRadius(__instance.nestPosition, 4f);
+        //         var scrapToSpawn = spawnableScrapArray[newRandom.Next(spawnableScrapArray.Count())];
+        //         var newGo = Object.Instantiate<GameObject>(
+        //             scrapToSpawn.spawnableItem.spawnPrefab, 
+        //             positionInRadius, Quaternion.identity, RoundManager.Instance.spawnedScrapContainer);
+        //
+        //         var grabbable = newGo.GetComponent<GrabbableObject>();
+        //         grabbable.transform.rotation = Quaternion.Euler(grabbable.itemProperties.restingRotation);
+        //         grabbable.fallTime = 0.0f;
+        //         grabbable.scrapValue = Mathf.RoundToInt(newRandom.Next(scrapToSpawn.spawnableItem.minValue, scrapToSpawn.spawnableItem.maxValue) *
+        //                                           RoundManager.Instance.scrapValueMultiplier);
+        //         var netObj = newGo.GetComponent<NetworkObject>();
+        //         netObj.Spawn();
+        //
+        //         netObjRef[idx] = (NetworkObjectReference)netObj;
+        //         scrapValues[idx] = grabbable.scrapValue;
+        //     }
+        //
+        //     Singleton<HundredQuota>.Logger.LogWarning($"We've successfully injected a loot pile of size {numberOfScrapToGenerate} @ position {__instance.nestPosition}");
+        //     HUDManager.Instance.DisplayTip("Lootbug", $"Spawned {numberOfScrapToGenerate} items at position {__instance.nestPosition}");
+        //     RoundManager.Instance.StartCoroutine(scrapSyncCoroutine?.Invoke(RoundManager.Instance, new object[] {netObjRef, scrapValues}) as IEnumerator);
+        // }
         [HarmonyPatch(typeof(Terminal), "Update")]
         [HarmonyPrefix]
         public static void CheckForInput(Terminal __instance)
