@@ -5,11 +5,11 @@
     <PropertyGroup>
         <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
         <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-        <ProjectGuid>{65C5D60F-0344-4A88-93D0-924B18A632DD}</ProjectGuid>
+        <ProjectGuid>{DA8C1F60-C0A2-4713-B24D-C6B10AB8CC22}</ProjectGuid>
         <OutputType>Library</OutputType>
         <AppDesignerFolder>Properties</AppDesignerFolder>
-        <RootNamespace>NicholaScott.LethalCompany.NetworkTest</RootNamespace>
-        <AssemblyName>NicholaScott.LethalCompany.NetworkTest</AssemblyName>
+        <RootNamespace>NicholaScott.LethalCompany.BeesOnly</RootNamespace>
+        <AssemblyName>NicholaScott.LethalCompany.BeesOnly</AssemblyName>
         <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
         <FileAlignment>512</FileAlignment>
     </PropertyGroup>
@@ -33,24 +33,48 @@
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
     <ItemGroup>
+        <Reference Include="0Harmony20">
+          <HintPath>..\..\..\AppData\Roaming\Thunderstore Mod Manager\DataFolder\LethalCompany\profiles\Default\BepInEx\core\0Harmony20.dll</HintPath>
+          <Private>False</Private>
+        </Reference>
+        <Reference Include="Assembly-CSharp">
+          <HintPath>..\packages\Assembly-CSharp.dll</HintPath>
+          <Private>False</Private>
+        </Reference>
         <Reference Include="BepInEx">
-          <HintPath>..\packages\BepInEx.dll</HintPath>
+          <HintPath>..\..\..\AppData\Roaming\Thunderstore Mod Manager\DataFolder\LethalCompany\profiles\Default\BepInEx\core\BepInEx.dll</HintPath>
+          <Private>False</Private>
         </Reference>
         <Reference Include="System"/>
         <Reference Include="System.Core"/>
         <Reference Include="System.Data"/>
         <Reference Include="System.Xml"/>
+        <Reference Include="Unity.Netcode.Runtime">
+          <HintPath>..\packages\Unity.Netcode.Runtime.dll</HintPath>
+          <Private>False</Private>
+        </Reference>
         <Reference Include="UnityEngine">
           <HintPath>..\packages\UnityEngine.dll</HintPath>
           <Private>False</Private>
         </Reference>
+        <Reference Include="UnityEngine.AIModule">
+          <HintPath>..\packages\UnityEngine.AIModule.dll</HintPath>
+          <Private>False</Private>
+        </Reference>
         <Reference Include="UnityEngine.CoreModule">
           <HintPath>..\packages\UnityEngine.CoreModule.dll</HintPath>
+          <Private>False</Private>
         </Reference>
     </ItemGroup>
     <ItemGroup>
-        <Compile Include="Class1.cs"/>
+        <Compile Include="BeesOnlyMod.cs" />
         <Compile Include="Properties\AssemblyInfo.cs"/>
+    </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\NicholaScott.BepInEx.Utils\NicholaScott.BepInEx.Utils.csproj">
+        <Project>{40bd9160-e0a3-402f-ae4f-059b39509f43}</Project>
+        <Name>NicholaScott.BepInEx.Utils</Name>
+      </ProjectReference>
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets"/>
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

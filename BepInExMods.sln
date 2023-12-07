@@ -14,6 +14,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NicholaScott.LethalCompany.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NicholaScott.LethalCompany.NoHornNoise", "NicholaScott.LethalCompany.NoHornNoise\NicholaScott.LethalCompany.NoHornNoise.csproj", "{C46A93C3-7D37-4BD5-BEFF-A85F6A9A4D87}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NicholaScott.LethalCompany.TrueTerminal", "NicholaScott.LethalCompany.TrueTerminal\NicholaScott.LethalCompany.TrueTerminal.csproj", "{423B4053-899B-44B4-9205-70E111CE7F1B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NicholaScott.LethalCompany.BeesOnly", "NicholaScott.LethalCompany.BeesOnly\NicholaScott.LethalCompany.BeesOnly.csproj", "{DA8C1F60-C0A2-4713-B24D-C6B10AB8CC22}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -48,5 +52,13 @@ Global
 		{C46A93C3-7D37-4BD5-BEFF-A85F6A9A4D87}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C46A93C3-7D37-4BD5-BEFF-A85F6A9A4D87}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C46A93C3-7D37-4BD5-BEFF-A85F6A9A4D87}.Release|Any CPU.Build.0 = Release|Any CPU
+		{423B4053-899B-44B4-9205-70E111CE7F1B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{423B4053-899B-44B4-9205-70E111CE7F1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{423B4053-899B-44B4-9205-70E111CE7F1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{423B4053-899B-44B4-9205-70E111CE7F1B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA8C1F60-C0A2-4713-B24D-C6B10AB8CC22}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA8C1F60-C0A2-4713-B24D-C6B10AB8CC22}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA8C1F60-C0A2-4713-B24D-C6B10AB8CC22}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA8C1F60-C0A2-4713-B24D-C6B10AB8CC22}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

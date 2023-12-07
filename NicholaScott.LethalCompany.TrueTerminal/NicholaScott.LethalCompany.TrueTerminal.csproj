@@ -5,11 +5,11 @@
     <PropertyGroup>
         <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
         <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-        <ProjectGuid>{65C5D60F-0344-4A88-93D0-924B18A632DD}</ProjectGuid>
+        <ProjectGuid>{423B4053-899B-44B4-9205-70E111CE7F1B}</ProjectGuid>
         <OutputType>Library</OutputType>
         <AppDesignerFolder>Properties</AppDesignerFolder>
-        <RootNamespace>NicholaScott.LethalCompany.NetworkTest</RootNamespace>
-        <AssemblyName>NicholaScott.LethalCompany.NetworkTest</AssemblyName>
+        <RootNamespace>NicholaScott.LethalCompany.TrueTerminal</RootNamespace>
+        <AssemblyName>NicholaScott.LethalCompany.TrueTerminal</AssemblyName>
         <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
         <FileAlignment>512</FileAlignment>
     </PropertyGroup>
@@ -33,23 +33,48 @@
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
     <ItemGroup>
+        <Reference Include="0Harmony20">
+          <HintPath>..\..\..\AppData\Roaming\Thunderstore Mod Manager\DataFolder\LethalCompany\profiles\Default\BepInEx\core\0Harmony20.dll</HintPath>
+          <Private>False</Private>
+        </Reference>
+        <Reference Include="Assembly-CSharp">
+          <HintPath>..\packages\Assembly-CSharp.dll</HintPath>
+          <Private>False</Private>
+        </Reference>
         <Reference Include="BepInEx">
-          <HintPath>..\packages\BepInEx.dll</HintPath>
+          <HintPath>..\..\..\AppData\Roaming\Thunderstore Mod Manager\DataFolder\LethalCompany\profiles\Default\BepInEx\core\BepInEx.dll</HintPath>
+          <Private>False</Private>
+        </Reference>
+        <Reference Include="NicholaScott.BepInEx.Utils">
+          <HintPath>..\NicholaScott.BepInEx.Utils\bin\Debug\NicholaScott.BepInEx.Utils.dll</HintPath>
+          <Private>False</Private>
         </Reference>
         <Reference Include="System"/>
         <Reference Include="System.Core"/>
         <Reference Include="System.Data"/>
         <Reference Include="System.Xml"/>
+        <Reference Include="Unity.Netcode.Runtime">
+          <HintPath>..\packages\Unity.Netcode.Runtime.dll</HintPath>
+        </Reference>
+        <Reference Include="Unity.TextMeshPro">
+          <HintPath>..\packages\Unity.TextMeshPro.dll</HintPath>
+          <Private>False</Private>
+        </Reference>
         <Reference Include="UnityEngine">
           <HintPath>..\packages\UnityEngine.dll</HintPath>
           <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine.CoreModule">
           <HintPath>..\packages\UnityEngine.CoreModule.dll</HintPath>
+          <Private>False</Private>
+        </Reference>
+        <Reference Include="UnityEngine.UI">
+          <HintPath>..\packages\UnityEngine.UI.dll</HintPath>
+          <Private>False</Private>
         </Reference>
     </ItemGroup>
     <ItemGroup>
-        <Compile Include="Class1.cs"/>
+        <Compile Include="TrueTerminal.cs" />
         <Compile Include="Properties\AssemblyInfo.cs"/>
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets"/>

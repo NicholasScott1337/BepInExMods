@@ -34,39 +34,67 @@
     </PropertyGroup>
     <ItemGroup>
         <Reference Include="0Harmony20">
-          <HintPath>C:\Users\daymo\AppData\Roaming\Thunderstore Mod Manager\DataFolder\LethalCompany\profiles\Default\BepInEx\core\0Harmony20.dll</HintPath>
+          <HintPath>..\packages\0Harmony20.dll</HintPath>
           <Private>False</Private>
         </Reference>
         <Reference Include="Assembly-CSharp">
-          <HintPath>E:\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Assembly-CSharp.dll</HintPath>
+          <HintPath>..\packages\Assembly-CSharp.dll</HintPath>
           <Private>False</Private>
         </Reference>
         <Reference Include="BepInEx">
-          <HintPath>C:\Users\daymo\AppData\Roaming\Thunderstore Mod Manager\DataFolder\LethalCompany\profiles\Default\BepInEx\core\BepInEx.dll</HintPath>
+          <HintPath>..\packages\BepInEx.dll</HintPath>
+          <Private>False</Private>
+        </Reference>
+        <Reference Include="Facepunch.Steamworks.Win64">
+          <HintPath>..\packages\Facepunch.Steamworks.Win64.dll</HintPath>
           <Private>False</Private>
         </Reference>
         <Reference Include="NicholaScott.BepInEx.Utils">
           <HintPath>..\nicholascott.bepinex.utils\bin\Debug\nicholascott.bepinex.utils.dll</HintPath>
           <Private>False</Private>
         </Reference>
+        <Reference Include="NicholaScott.LethalCompany.TrueTerminal">
+          <HintPath>..\NicholaScott.LethalCompany.TrueTerminal\bin\Debug\NicholaScott.LethalCompany.TrueTerminal.dll</HintPath>
+          <Private>False</Private>
+        </Reference>
         <Reference Include="System"/>
         <Reference Include="System.Core"/>
         <Reference Include="System.Data"/>
         <Reference Include="System.Xml"/>
+        <Reference Include="TerminalApi">
+          <HintPath>..\packages\TerminalApi.dll</HintPath>
+          <Private>False</Private>
+        </Reference>
         <Reference Include="Unity.Netcode.Runtime">
-          <HintPath>E:\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\Unity.Netcode.Runtime.dll</HintPath>
+          <HintPath>..\packages\Unity.Netcode.Runtime.dll</HintPath>
+          <Private>False</Private>
+        </Reference>
+        <Reference Include="Unity.TextMeshPro">
+          <HintPath>..\packages\Unity.TextMeshPro.dll</HintPath>
           <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine">
-          <HintPath>E:\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.dll</HintPath>
+          <HintPath>..\packages\UnityEngine.dll</HintPath>
+          <Private>False</Private>
+        </Reference>
+        <Reference Include="UnityEngine.AIModule">
+          <HintPath>..\packages\UnityEngine.AIModule.dll</HintPath>
           <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine.AnimationModule">
-          <HintPath>E:\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.AnimationModule.dll</HintPath>
+          <HintPath>..\packages\UnityEngine.AnimationModule.dll</HintPath>
           <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine.CoreModule">
-          <HintPath>E:\Steam\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+          <HintPath>..\packages\UnityEngine.CoreModule.dll</HintPath>
+          <Private>False</Private>
+        </Reference>
+        <Reference Include="UnityEngine.IMGUIModule">
+          <HintPath>..\packages\UnityEngine.IMGUIModule.dll</HintPath>
+          <Private>False</Private>
+        </Reference>
+        <Reference Include="UnityEngine.PhysicsModule">
+          <HintPath>..\packages\UnityEngine.PhysicsModule.dll</HintPath>
           <Private>False</Private>
         </Reference>
     </ItemGroup>
