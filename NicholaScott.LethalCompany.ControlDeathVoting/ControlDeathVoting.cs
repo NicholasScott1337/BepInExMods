@@ -7,8 +7,8 @@ using NicholaScott.BepInEx.Utils.Patching;
 
 namespace NicholaScott.LethalCompany.ControlDeathVoting
 {
-    [BepInDependency("NicholaScott.BepInEx.Utils", "1.1.0")]
-    [BepInPlugin("NicholaScott.LethalCompany.ControlDeathVoting", "Control Death Voting", "1.0.1")]
+    [BepInDependency("NicholaScott.BepInEx.Utils", "1.2.0")]
+    [BepInPlugin("NicholaScott.LethalCompany.ControlDeathVoting", "Control Death Voting", "1.0.2")]
     public class ControlDeathVoting : BaseUnityPlugin
     {
         public struct Configuration

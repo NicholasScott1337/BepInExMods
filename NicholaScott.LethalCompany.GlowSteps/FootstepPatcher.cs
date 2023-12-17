@@ -29,10 +29,8 @@ namespace NicholaScott.LethalCompany.GlowSteps
         public static void AddPositionToTracking(PlayerControllerB __instance)
         {
             var config = Singleton<GlowSteps, GlowSteps.Configuration>.Configuration;
-            var currentStrength = __instance.IsOwner ? Mathf.RoundToInt(__instance.sprintMeter * 3f) : 3;
+            var currentStrength = __instance.IsOwner ? __instance.isSprinting ? 3 : __instance.isCrouching || __instance.isExhausted || __instance.isMovementHindered != 0 ? 1 : 2 : 2;
             //if (!__instance.IsOwner) return; // Handle spawning colors for other players later, when we can actually network the behaviour
-            if (currentStrength == 0) return; // No need to spawn a 0 strength
-            if (__instance.IsOwner && !__instance.isSprinting) return; // Not sprinting, no footsteps
             if (!__instance.isInsideFactory && config.InFactory) return;
             if (!_leftFoots.ContainsKey(__instance.playerSteamId)) _leftFoots.Add(__instance.playerSteamId, -1.0f);
 

@@ -12,8 +12,8 @@ using UnityEngine.Serialization;
 
 namespace NicholaScott.LethalCompany.GlowSteps
 {
-    [BepInDependency("NicholaScott.BepInEx.Utils", "1.1.0")]
-    [BepInPlugin("NicholaScott.LethalCompany.GlowSteps", "Glow Steps", "1.1.1")]
+    [BepInDependency("NicholaScott.BepInEx.Utils", "1.2.0")]
+    [BepInPlugin("NicholaScott.LethalCompany.GlowSteps", "Glow Steps", "1.1.3")]
     public class GlowSteps : BaseUnityPlugin
     {
         public struct Configuration

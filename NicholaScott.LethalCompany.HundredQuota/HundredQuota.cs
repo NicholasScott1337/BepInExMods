@@ -5,17 +5,22 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using BepInEx;
+using GameNetcodeStuff;
 using HarmonyLib;
 using NicholaScott.BepInEx.Utils.Configuration;
 using NicholaScott.BepInEx.Utils.Instancing;
 using NicholaScott.BepInEx.Utils.Patching;
+using NicholaScott.LethalCompany.API;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.AI;
 using Object = UnityEngine.Object;
+using Random = UnityEngine.Random;
 
 namespace NicholaScott.LethalCompany.HundredQuota
 {
     [BepInDependency("NicholaScott.BepInEx.Utils", "1.1.0")]
+    [BepInDependency("NicholaScott.LethalCompany.API", "0.0.1")]
     [BepInDependency("NicholaScott.LethalCompany.TrueTerminal", "0.0.1")]
     [BepInPlugin("NicholaScott.LethalCompany.HundredQuota", "Hundred Quota", "0.0.1")]
     public class HundredQuota : BaseUnityPlugin
@@ -32,21 +37,6 @@ namespace NicholaScott.LethalCompany.HundredQuota
             public int Titan;
         }
 
-        public bool PrefabExists(string query, out GameObject target)
-        {
-            foreach (var pref in NetworkManager.Singleton.NetworkConfig.Prefabs.Prefabs)
-            {
-                if (pref.Prefab.name.ToLower().Contains(query))
-                {
-                    target = pref.Prefab;
-                    return true;
-                }
-            }
-            
-            Logger.LogInfo($"Failed to locate a prefab that matches the name {query}!");
-            target = null;
-            return false;
-        }
         public void Awake()
         {
             Singleton<HundredQuota>.Instance = this;
@@ -62,50 +52,7 @@ namespace NicholaScott.LethalCompany.HundredQuota
                 Titan = 400
             });
             Assembly.GetExecutingAssembly().PatchAttribute<Production>(Info.Metadata.GUID, Logger.LogInfo);
-
             
-            TrueTerminal.TrueTerminal.RegisterCommand("network.prefabs.list", parameters =>
-            {
-                var x = new StringBuilder();
-                foreach (var pref in NetworkManager.Singleton.NetworkConfig.Prefabs.Prefabs)
-                {
-                    x.Append($"{pref.Prefab.name}, ");
-                }
-                GUIUtility.systemCopyBuffer = x.ToString();
-                Logger.LogInfo("Prefabs list copied to clipboard!");
-            });
-            TrueTerminal.TrueTerminal.RegisterCommand("network.prefabs.spawn.bind", parameters =>
-            {
-                if (parameters.Length == 0)
-                {
-                    Logger.LogError("You must provide a prefab name from .network.prefabs.list");
-                    return;
-                }
-
-                if (!PrefabExists(parameters[0], out var target)) return;
-                QuotaPatcher.SpawnPrefab = target;
-                QuotaPatcher.SpawnPrefabAssigned = true;
-            });
-            TrueTerminal.TrueTerminal.RegisterCommand("network.prefabs.spawn", parameters =>
-            {
-                if (parameters.Length == 0)
-                {
-                    Logger.LogError("You must provide a prefab name from .network.prefabs.list");
-                    return;
-                }
-
-                if (!PrefabExists(parameters[0], out var target)) return;
-                var playerTarget = GameNetworkManager.Instance.localPlayerController;
-                if (parameters.Length > 1)
-                    playerTarget = StartOfRound.Instance.allPlayerScripts.First(pl =>
-                        pl.playerUsername.ToLower().Contains(parameters[1].ToLower()));
-                    
-                Logger.LogInfo($"Spawning {target.name} @ player {playerTarget.playerUsername}");
-                    
-                var go = Instantiate(target, 
-                    RoundManager.Instance.GetRandomNavMeshPositionInRadius(playerTarget.gameplayCamera.transform.position), Quaternion.Euler(Vector3.zero));
-                go.gameObject.GetComponentInChildren<NetworkObject>().Spawn(true);
-            });
         }
     }
 
@@ -114,66 +61,134 @@ namespace NicholaScott.LethalCompany.HundredQuota
     {
         public static GameObject SpawnPrefab;
         public static bool SpawnPrefabAssigned = false;
+        private static bool _isPointing = false;
+        private static Vector3 _target = Vector3.zero;
+        private static readonly int EmoteNumber = Animator.StringToHash("emoteNumber");
 
-        public static SpawnableItemWithRarity FindPrefab(params string[] queries)
+        [HarmonyPatch(typeof(PlayerControllerB), "Update")]
+        [HarmonyPostfix]
+        public static void PlayerPointAtPlayer(PlayerControllerB __instance)
         {
-            var lambda = new Predicate<SpawnableItemWithRarity>((f) =>
+            if (!__instance.IsOwner || !__instance.isPlayerControlled) return;
+            
+            var isPointing = __instance.playerBodyAnimator.GetInteger(EmoteNumber) == 2;
+            var transform = __instance.gameplayCamera.transform;
+            
+            if (__instance.performingEmote && isPointing)
             {
-                var toLowered = f.spawnableItem.itemName.ToLower();
-                var matches = true;
-                foreach (var query in queries)
-                    if (query.StartsWith("!") ? toLowered.Contains(query.Substring(1)) : !toLowered.Contains(query))
-                        matches = false;
-                return matches;
-            });
-            foreach (var selectableLevel in StartOfRound.Instance.levels)
-            {
-                var scrapSorted = selectableLevel.spawnableScrap.Where(lambda)
-                if (selectableLevel.spawnableScrap.Exists(lambda))
-                    return selectableLevel.spawnableScrap.Find(lambda);
+                _isPointing = true;
+                if (Physics.Raycast(new Ray(transform.position + transform.forward * 0.2f, transform.forward),
+                        out var hit, 100f, StartOfRound.Instance.collidersAndRoomMaskAndDefault))
+                {
+                    var landMine = hit.transform.gameObject.GetComponentInChildren<Landmine>();
+                    var turret = hit.transform.gameObject.GetComponentInChildren<Turret>();
+                    if (landMine)
+                        landMine.ToggleMine(false);
+                    if (turret)
+                        turret.ToggleTurretEnabled(false);
+                }
+                else
+                    _isPointing = false;
             }
-
-            throw new Exception("The provided queries resulted in no prefab in all levels.");
+            else
+                _isPointing = false;
         }
-        
-        [HarmonyPatch(typeof(RoundManager), "waitForScrapToSpawnToSync")]
-        [HarmonyPrefix]
-        public static void InjectAdditionalScrapItems(ref NetworkObjectReference[] spawnedScrap, ref int[] scrapValues)
+
+        private static void NotifyDisallowedConnectionChange()
         {
-            var newRandom = new System.Random(StartOfRound.Instance.randomMapSeed - 13);
-            var numberOfScrapToGenerate = Mathf.RoundToInt(Mathf.Pow(2, StartOfRound.Instance.daysPlayersSurvivedInARow + 1));
-            numberOfScrapToGenerate = newRandom.Next(numberOfScrapToGenerate / 2, numberOfScrapToGenerate);
-            var netObjRef = new NetworkObjectReference[numberOfScrapToGenerate];
-            var scrapPrices = new int[numberOfScrapToGenerate];
-            var spawnableScrapArray = RoundManager.Instance.currentLevel.spawnableScrap;
-
-            var goldItem = FindPrefab("gold", "bar");
-            
-            for (var idx = 0; idx < numberOfScrapToGenerate; idx++)
-            {
-                var spawnPositions = GameObject.FindGameObjectsWithTag("OutsideAINode");
-                var spawnPos = spawnPositions[newRandom.Next(spawnPositions.Length)];
-                var positionInRadius = RoundManager.Instance.GetRandomNavMeshPositionInRadius(spawnPos.transform.position, 4f);
-                var newGo = Object.Instantiate<GameObject>(
-                    goldItem.spawnableItem.spawnPrefab, 
-                    positionInRadius, Quaternion.identity, RoundManager.Instance.spawnedScrapContainer);
-            
-                var grabbable = newGo.GetComponent<GrabbableObject>();
-                grabbable.transform.rotation = Quaternion.Euler(grabbable.itemProperties.restingRotation);
-                grabbable.fallTime = 0.0f;
-                grabbable.scrapValue = Mathf.RoundToInt(newRandom.Next(goldItem.spawnableItem.minValue, goldItem.spawnableItem.maxValue) *
-                                                  RoundManager.Instance.scrapValueMultiplier);
-                var netObj = newGo.GetComponent<NetworkObject>();
-                netObj.Spawn();
-            
-                netObjRef[idx] = (NetworkObjectReference)netObj;
-                scrapPrices[idx] = grabbable.scrapValue;
-            }
-            HUDManager.Instance.AddTextToChatOnServer($"Placed {numberOfScrapToGenerate} Gold Bar{(numberOfScrapToGenerate > 1 ? "s" : "")} in exterior.");
-            spawnedScrap = netObjRef.Concat(spawnedScrap).ToArray();
-            scrapValues = scrapPrices.Concat(scrapValues).ToArray();
+            if (!HUDManager.Instance) return;
+            typeof(HUDManager).GetMethod("AddChatMessage", BindingFlags.Instance | BindingFlags.NonPublic)
+            ?.Invoke(
+                HUDManager.Instance,
+                new object[]{$"<color=#{(GameNetworkManager.Instance.disallowConnection ? "FF0000>Disabled" : "00FF00>Enabled")}</color> connections!", ""}
+            );
         }
-        
+        [HarmonyPatch(typeof(Terminal), "Update")]
+        [HarmonyPostfix]
+        public static void RejectIfMoreThanTwo(Terminal __instance)
+        {
+            if (!UnityInput.Current.GetKeyUp(KeyCode.Backslash)) return;
+            GameNetworkManager.Instance.disallowConnection = !GameNetworkManager.Instance.disallowConnection;
+            NotifyDisallowedConnectionChange();
+        }
+
+        [HarmonyPatch(typeof(GameNetworkManager), "ConnectionApproval")]
+        [HarmonyPostfix]
+        public static void ToggleRejectionState(ref NetworkManager.ConnectionApprovalResponse response)
+        {
+            if (GameNetworkManager.Instance.disallowConnection) return;
+            GameNetworkManager.Instance.disallowConnection = response.Approved;
+            NotifyDisallowedConnectionChange();
+        }
+
+        private static IEnumerator DelayedTimeTransmission(TimeOfDay timeOfDay)
+        {
+            yield return new WaitForSeconds(5f);
+            HUDManager.Instance.UseSignalTranslatorServerRpc(HUDManager.Instance.SetClock(timeOfDay.normalizedTimeOfDay, timeOfDay.numberOfHours, false));
+        }
+        [HarmonyPatch(typeof(TimeOfDay), nameof(TimeOfDay.OnHourChanged))]
+        [HarmonyPostfix]
+        public static void AnnounceHour(TimeOfDay __instance)
+        {
+            var signalTranslator = Object.FindObjectOfType<SignalTranslator>();
+            if (signalTranslator != null)
+                signalTranslator.StartCoroutine(DelayedTimeTransmission(__instance));
+        }
+
+        [HarmonyPatch(typeof(GiftBoxItem), nameof(GiftBoxItem.Start))]
+        [HarmonyPostfix]
+        public static void ChanceToBeShotgunShells(GiftBoxItem __instance, ref GameObject ___objectInPresent)
+        {
+            var ncAi = StartOfRound.Instance.FindPrefabByName<EnemyType>("nut");
+            var nutcracker = ncAi.enemyPrefab.GetComponentInChildren<NutcrackerEnemyAI>();
+            
+            Singleton<HundredQuota>.Logger.LogInfo("Properly assigned one shotgun shell!!!!!");
+            if ((new System.Random(StartOfRound.Instance.randomMapSeed - 7)).NextDouble() >= 0.5f)
+                ___objectInPresent = nutcracker.shotgunShellPrefab;
+            
+            var itemInObj = ___objectInPresent.GetComponentInChildren<GrabbableObject>();
+            itemInObj.itemProperties.minValue += __instance.scrapValue;
+            itemInObj.itemProperties.maxValue += __instance.scrapValue;
+        }
+        //
+        // [HarmonyPatch(typeof(RoundManager), "waitForScrapToSpawnToSync")]
+        // [HarmonyPrefix]
+        // public static void InjectAdditionalScrapItems(ref NetworkObjectReference[] spawnedScrap, ref int[] scrapValues)
+        // {
+        //     var newRandom = new System.Random(StartOfRound.Instance.randomMapSeed - 13);
+        //     var numberOfScrapToGenerate = Mathf.RoundToInt(Mathf.Pow(2, StartOfRound.Instance.daysPlayersSurvivedInARow + 1));
+        //     numberOfScrapToGenerate = newRandom.Next(numberOfScrapToGenerate / 2, numberOfScrapToGenerate);
+        //     var netObjRef = new NetworkObjectReference[numberOfScrapToGenerate];
+        //     var scrapPrices = new int[numberOfScrapToGenerate];
+        //     var spawnableScrapArray = RoundManager.Instance.currentLevel.spawnableScrap;
+        //
+        //     var goldItem = FindPrefab("gold", "bar");
+        //     
+        //     for (var idx = 0; idx < numberOfScrapToGenerate; idx++)
+        //     {
+        //         var spawnPositions = GameObject.FindGameObjectsWithTag("OutsideAINode");
+        //         var spawnPos = spawnPositions[newRandom.Next(spawnPositions.Length)];
+        //         var positionInRadius = RoundManager.Instance.GetRandomNavMeshPositionInRadius(spawnPos.transform.position, 4f);
+        //         var newGo = Object.Instantiate<GameObject>(
+        //             goldItem.spawnableItem.spawnPrefab, 
+        //             positionInRadius, Quaternion.identity, RoundManager.Instance.spawnedScrapContainer);
+        //     
+        //         var grabbable = newGo.GetComponent<GrabbableObject>();
+        //         grabbable.transform.rotation = Quaternion.Euler(grabbable.itemProperties.restingRotation);
+        //         grabbable.fallTime = 0.0f;
+        //         grabbable.scrapValue = Mathf.RoundToInt(newRandom.Next(goldItem.spawnableItem.minValue, goldItem.spawnableItem.maxValue) *
+        //                                           RoundManager.Instance.scrapValueMultiplier);
+        //         var netObj = newGo.GetComponent<NetworkObject>();
+        //         netObj.Spawn();
+        //     
+        //         netObjRef[idx] = (NetworkObjectReference)netObj;
+        //         scrapPrices[idx] = grabbable.scrapValue;
+        //     }
+        //     HUDManager.Instance.AddTextToChatOnServer($"Placed {numberOfScrapToGenerate} Gold Bar{(numberOfScrapToGenerate > 1 ? "s" : "")} in exterior.");
+        //     spawnedScrap = netObjRef.Concat(spawnedScrap).ToArray();
+        //     scrapValues = scrapPrices.Concat(scrapValues).ToArray();
+        // }
+
         // [HarmonyPatch(typeof(HoarderBugAI), "ChooseNestPosition")]
         // [HarmonyPostfix]
         // public static void SpawnHoarderLootPile(HoarderBugAI __instance)
@@ -221,43 +236,42 @@ namespace NicholaScott.LethalCompany.HundredQuota
             var ray = new Ray(transform.position, transform.forward);
             if (!Physics.Raycast(ray, out var hitInfo, 100f,
                     StartOfRound.Instance.collidersAndRoomMaskAndDefault)) return;
-
-            SpawnPrefab = RoundManager.Instance.currentLevel.DaytimeEnemies
-                .First(f => f.enemyType.enemyName.ToLower().Contains("bee") && !f.enemyType.enemyName.ToLower().Contains("docile")).enemyType.enemyPrefab;
-            
+        
+            SpawnPrefab = StartOfRound.Instance.FindPrefabByName<Item>("magnify").spawnPrefab;
+                
             var go = Object.Instantiate(SpawnPrefab, 
                 hitInfo.point - transform.forward * 0.5f, Quaternion.Euler(transform.forward));
             go.gameObject.GetComponentInChildren<NetworkObject>().Spawn(true);
         }
-        
-        [HarmonyPatch(typeof(PatcherTool), nameof(PatcherTool.StopShockingServerRpc))]
-        [HarmonyPostfix]
-        public static void BlowThatBitchUp(PatcherTool __instance)
-        {
-            var target = __instance.shockedTargetScript;
-            if (target == null) return;
-            var targetHittable = target.GetNetworkObject().transform.GetComponentInChildren<IHittable>();
-            if (targetHittable == null) return;
-            
-            Landmine.SpawnExplosion(target.GetShockablePosition(), true, 3f, 1f);
-            targetHittable.Hit(10, Vector3.forward, __instance.playerHeldBy);
-        } 
-        
-        [HarmonyPatch(typeof(QuickMenuManager), nameof(QuickMenuManager.ConfirmKickUserFromServer))]
-        [HarmonyPrefix]
-        public static bool SilentKick(QuickMenuManager __instance)
-        {
-            var playObjToKick = (int) typeof(QuickMenuManager)
-                .GetField("playerObjToKick", BindingFlags.Instance | BindingFlags.NonPublic)?.GetValue(__instance);
-            if (playObjToKick > 0 && playObjToKick <= 3)
-            {
-                __instance.ConfirmKickUserPanel.SetActive(false);
-                if (!StartOfRound.Instance.IsServer) return false;
-                NetworkManager.Singleton.DisconnectClient(StartOfRound.Instance.allPlayerScripts[playObjToKick].actualClientId, "No message received..");
-            }
-
-            return false;
-        }
+        //
+        // [HarmonyPatch(typeof(PatcherTool), nameof(PatcherTool.StopShockingServerRpc))]
+        // [HarmonyPostfix]
+        // public static void BlowThatBitchUp(PatcherTool __instance)
+        // {
+        //     var target = __instance.shockedTargetScript;
+        //     if (target == null) return;
+        //     var targetHittable = target.GetNetworkObject().transform.GetComponentInChildren<IHittable>();
+        //     if (targetHittable == null) return;
+        //     
+        //     Landmine.SpawnExplosion(target.GetShockablePosition(), true, 3f, 1f);
+        //     targetHittable.Hit(10, Vector3.forward, __instance.playerHeldBy);
+        // } 
+        //
+        // [HarmonyPatch(typeof(QuickMenuManager), nameof(QuickMenuManager.ConfirmKickUserFromServer))]
+        // [HarmonyPrefix]
+        // public static bool SilentKick(QuickMenuManager __instance)
+        // {
+        //     var playObjToKick = (int) typeof(QuickMenuManager)
+        //         .GetField("playerObjToKick", BindingFlags.Instance | BindingFlags.NonPublic)?.GetValue(__instance);
+        //     if (playObjToKick > 0 && playObjToKick <= 3)
+        //     {
+        //         __instance.ConfirmKickUserPanel.SetActive(false);
+        //         if (!StartOfRound.Instance.IsServer) return false;
+        //         NetworkManager.Singleton.DisconnectClient(StartOfRound.Instance.allPlayerScripts[playObjToKick].actualClientId, "No message received..");
+        //     }
+        //
+        //     return false;
+        // }
         // [HarmonyPatch(typeof(DeadBodyInfo), "Update")]
         // [HarmonyPostfix]
         // public static void ItsInTheShip(DeadBodyInfo __instance) => __instance.isInShip = true;

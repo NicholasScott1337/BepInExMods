@@ -32,17 +32,20 @@
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
+    <PropertyGroup>
+      <PreBuildEvent>"../../../PrivatizeCSProj.ps1"</PreBuildEvent>
+    </PropertyGroup>
     <ItemGroup>
         <Reference Include="0Harmony20">
-          <HintPath>..\packages\0Harmony20.dll</HintPath>
+          <HintPath>..\packages\build\0Harmony20.dll</HintPath>
           <Private>False</Private>
         </Reference>
         <Reference Include="Assembly-CSharp">
-          <HintPath>..\packages\Assembly-CSharp.dll</HintPath>
+          <HintPath>..\packages\build\Assembly-CSharp.dll</HintPath>
           <Private>False</Private>
         </Reference>
         <Reference Include="BepInEx">
-          <HintPath>..\packages\BepInEx.dll</HintPath>
+          <HintPath>..\packages\build\BepInEx.dll</HintPath>
           <Private>False</Private>
         </Reference>
         <Reference Include="System"/>
@@ -50,19 +53,19 @@
         <Reference Include="System.Data"/>
         <Reference Include="System.Xml"/>
         <Reference Include="Unity.Netcode.Runtime">
-          <HintPath>..\packages\Unity.Netcode.Runtime.dll</HintPath>
+          <HintPath>..\packages\build\Unity.Netcode.Runtime.dll</HintPath>
           <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine">
-          <HintPath>..\packages\UnityEngine.dll</HintPath>
+          <HintPath>..\packages\build\UnityEngine.dll</HintPath>
           <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine.CoreModule">
-          <HintPath>..\packages\UnityEngine.CoreModule.dll</HintPath>
+          <HintPath>..\packages\build\UnityEngine.CoreModule.dll</HintPath>
           <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine.PhysicsModule">
-          <HintPath>..\packages\UnityEngine.PhysicsModule.dll</HintPath>
+          <HintPath>..\packages\build\UnityEngine.PhysicsModule.dll</HintPath>
           <Private>False</Private>
         </Reference>
     </ItemGroup>

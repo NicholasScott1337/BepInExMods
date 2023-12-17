@@ -11,8 +11,8 @@ using UnityEngine;
 
 namespace NicholaScott.LethalCompany.Lockdown
 {
-    [BepInDependency("NicholaScott.BepInEx.Utils", "1.1.0")]
-    [BepInPlugin("NicholaScott.LethalCompany.Lockdown", "Lockdown", "1.0.2")]
+    [BepInDependency("NicholaScott.BepInEx.Utils", "1.2.0")]
+    [BepInPlugin("NicholaScott.LethalCompany.Lockdown", "Lockdown", "1.0.3")]
     public class Lockdown : BaseUnityPlugin
     {
         public struct Configuration

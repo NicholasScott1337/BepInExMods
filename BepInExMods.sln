@@ -10,15 +10,17 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NicholaScott.LethalCompany.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NicholaScott.LethalCompany.HundredQuota", "NicholaScott.LethalCompany.HundredQuota\NicholaScott.LethalCompany.HundredQuota.csproj", "{7954A386-8C75-4702-9ECA-0AD3C555A51E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NicholaScott.LethalCompany.NetworkTest", "NicholaScott.LethalCompany.NetworkTest\NicholaScott.LethalCompany.NetworkTest.csproj", "{65C5D60F-0344-4A88-93D0-924B18A632DD}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NicholaScott.LethalCompany.NoHornNoise", "NicholaScott.LethalCompany.NoHornNoise\NicholaScott.LethalCompany.NoHornNoise.csproj", "{C46A93C3-7D37-4BD5-BEFF-A85F6A9A4D87}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NicholaScott.LethalCompany.TrueTerminal", "NicholaScott.LethalCompany.TrueTerminal\NicholaScott.LethalCompany.TrueTerminal.csproj", "{423B4053-899B-44B4-9205-70E111CE7F1B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NicholaScott.LethalCompany.BeesOnly", "NicholaScott.LethalCompany.BeesOnly\NicholaScott.LethalCompany.BeesOnly.csproj", "{DA8C1F60-C0A2-4713-B24D-C6B10AB8CC22}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NicholaScott.LethalCompany.API", "NicholaScott.LethalCompany.API\NicholaScott.LethalCompany.API.csproj", "{487AF155-B963-4107-A547-6BED3B3F8EAC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NicholaScott.LethalCompany.SpawnableItems", "NicholaScott.LethalCompany.SpawnableItems\NicholaScott.LethalCompany.SpawnableItems.csproj", "{6A25689C-CA4B-4FB5-98D4-300354668DC9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NicholaScott.LethalCompany.Clipboard", "NicholaScott.LethalCompany.Clipboard\NicholaScott.LethalCompany.Clipboard.csproj", "{D9B141C2-7EDA-41D6-A152-1D4F3707620D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NicholaScott.LethalCompany.MapperPro", "NicholaScott.LethalCompany.MapperPro\NicholaScott.LethalCompany.MapperPro.csproj", "{86294CFE-9AF3-4A0A-ABD3-8E0096C933F0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -46,10 +48,6 @@ Global
 		{7954A386-8C75-4702-9ECA-0AD3C555A51E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7954A386-8C75-4702-9ECA-0AD3C555A51E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7954A386-8C75-4702-9ECA-0AD3C555A51E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{65C5D60F-0344-4A88-93D0-924B18A632DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{65C5D60F-0344-4A88-93D0-924B18A632DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{65C5D60F-0344-4A88-93D0-924B18A632DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{65C5D60F-0344-4A88-93D0-924B18A632DD}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C46A93C3-7D37-4BD5-BEFF-A85F6A9A4D87}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C46A93C3-7D37-4BD5-BEFF-A85F6A9A4D87}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C46A93C3-7D37-4BD5-BEFF-A85F6A9A4D87}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -58,13 +56,21 @@ Global
 		{423B4053-899B-44B4-9205-70E111CE7F1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{423B4053-899B-44B4-9205-70E111CE7F1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{423B4053-899B-44B4-9205-70E111CE7F1B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DA8C1F60-C0A2-4713-B24D-C6B10AB8CC22}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DA8C1F60-C0A2-4713-B24D-C6B10AB8CC22}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DA8C1F60-C0A2-4713-B24D-C6B10AB8CC22}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DA8C1F60-C0A2-4713-B24D-C6B10AB8CC22}.Release|Any CPU.Build.0 = Release|Any CPU
 		{487AF155-B963-4107-A547-6BED3B3F8EAC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{487AF155-B963-4107-A547-6BED3B3F8EAC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{487AF155-B963-4107-A547-6BED3B3F8EAC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{487AF155-B963-4107-A547-6BED3B3F8EAC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6A25689C-CA4B-4FB5-98D4-300354668DC9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A25689C-CA4B-4FB5-98D4-300354668DC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A25689C-CA4B-4FB5-98D4-300354668DC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A25689C-CA4B-4FB5-98D4-300354668DC9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D9B141C2-7EDA-41D6-A152-1D4F3707620D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D9B141C2-7EDA-41D6-A152-1D4F3707620D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D9B141C2-7EDA-41D6-A152-1D4F3707620D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D9B141C2-7EDA-41D6-A152-1D4F3707620D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86294CFE-9AF3-4A0A-ABD3-8E0096C933F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86294CFE-9AF3-4A0A-ABD3-8E0096C933F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86294CFE-9AF3-4A0A-ABD3-8E0096C933F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86294CFE-9AF3-4A0A-ABD3-8E0096C933F0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
